@@ -182,7 +182,11 @@ namespace Cake.Core.Scripting
                 if (host.Context.FileSystem.Exist(referencePath))
                 {
                     var assembly = _assemblyLoader.Load(referencePath, true);
-                    assemblies.Add(assembly);
+
+                    if (assembly != null)
+                    {
+                        assemblies.Add(assembly);
+                    }
                 }
                 else
                 {
@@ -219,8 +223,11 @@ namespace Cake.Core.Scripting
                 session.ImportNamespace(@namespace);
             }
 
+            var defines = new HashSet<string>(result.Defines, StringComparer.Ordinal);
+            defines.AddRange(_conventions.GetDefaultDefines());
+
             // Execute the script.
-            var script = new Script(result.Namespaces, result.Lines, aliases, result.UsingAliases, result.UsingStaticDirectives, result.Defines);
+            var script = new Script(result.Namespaces, result.Lines, aliases, result.UsingAliases, result.UsingStaticDirectives, defines);
             session.Execute(script);
         }
 
