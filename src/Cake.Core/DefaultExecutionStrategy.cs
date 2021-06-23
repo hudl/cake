@@ -24,11 +24,7 @@ namespace Cake.Core
             _log = log;
         }
 
-        /// <summary>
-        /// Performs the setup.
-        /// </summary>
-        /// <param name="action">The action.</param>
-        /// <param name="context">The context.</param>
+        /// <inheritdoc/>
         public void PerformSetup(Action<ISetupContext> action, ISetupContext context)
         {
             if (action != null)
@@ -43,11 +39,7 @@ namespace Cake.Core
             }
         }
 
-        /// <summary>
-        /// Performs the teardown.
-        /// </summary>
-        /// <param name="action">The action.</param>
-        /// <param name="teardownContext">The context.</param>
+        /// <inheritdoc/>
         public void PerformTeardown(Action<ITeardownContext> action, ITeardownContext teardownContext)
         {
             if (teardownContext == null)
@@ -66,12 +58,7 @@ namespace Cake.Core
             }
         }
 
-        /// <summary>
-        /// Executes the specified task.
-        /// </summary>
-        /// <param name="task">The task to execute.</param>
-        /// <param name="context">The context.</param>
-        /// <returns>Returned Task</returns>
+        /// <inheritdoc/>
         public async Task ExecuteAsync(CakeTask task, ICakeContext context)
         {
             if (task != null)
@@ -88,11 +75,7 @@ namespace Cake.Core
             }
         }
 
-        /// <summary>
-        /// Skips the specified task.
-        /// </summary>
-        /// <param name="task">The task to skip.</param>
-        /// <param name="criteria">The criteria that caused the task to be skipped.</param>
+        /// <inheritdoc/>
         public void Skip(CakeTask task, CakeTaskCriteria criteria)
         {
             if (task != null)
@@ -109,41 +92,40 @@ namespace Cake.Core
             }
         }
 
-        /// <summary>
-        /// Executes the error reporter.
-        /// </summary>
-        /// <param name="action">The action.</param>
-        /// <param name="exception">The exception.</param>
-        public void ReportErrors(Action<Exception> action, Exception exception)
+        /// <inheritdoc/>
+        public async Task ReportErrorsAsync(Func<Exception, Task> action, Exception exception)
         {
-            action?.Invoke(exception);
+            if (action is null)
+            {
+                return;
+            }
+
+            await action(exception);
         }
 
-        /// <summary>
-        /// Executes the error handler.
-        /// </summary>
-        /// <param name="action">The action.</param>
-        /// <param name="exception">The exception.</param>
-        /// <param name="context">The context.</param>
-        public void HandleErrors(Action<Exception, ICakeContext> action, Exception exception, ICakeContext context)
+        /// <inheritdoc/>
+        public async Task HandleErrorsAsync(Func<Exception, ICakeContext, Task> action, Exception exception, ICakeContext context)
         {
-            action?.Invoke(exception, context);
+            if (action is null)
+            {
+                return;
+            }
+
+            await action(exception, context);
         }
 
-        /// <summary>
-        /// Invokes the finally handler.
-        /// </summary>
-        /// <param name="action">The action.</param>
-        public void InvokeFinally(Action action)
+        /// <inheritdoc/>
+        public async Task InvokeFinallyAsync(Func<Task> action)
         {
-            action?.Invoke();
+            if (action is null)
+            {
+                return;
+            }
+
+            await action();
         }
 
-        /// <summary>
-        /// Performs the specified setup action before each task is invoked.
-        /// </summary>
-        /// <param name="action">The action.</param>
-        /// <param name="taskSetupContext">The context.</param>
+        /// <inheritdoc/>
         public void PerformTaskSetup(Action<ITaskSetupContext> action, ITaskSetupContext taskSetupContext)
         {
             if (taskSetupContext == null)
@@ -157,11 +139,7 @@ namespace Cake.Core
             }
         }
 
-        /// <summary>
-        /// Performs the specified teardown action after each task is invoked.
-        /// </summary>
-        /// <param name="action">The action.</param>
-        /// <param name="taskTeardownContext">The context.</param>
+        /// <inheritdoc/>
         public void PerformTaskTeardown(Action<ITaskTeardownContext> action, ITaskTeardownContext taskTeardownContext)
         {
             if (taskTeardownContext == null)

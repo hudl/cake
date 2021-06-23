@@ -3,11 +3,12 @@
 // See the LICENSE file in the project root for more information.
 
 using Cake.Core;
+using Cake.Core.IO;
 
 namespace Cake.Common.Build.TeamCity.Data
 {
     /// <summary>
-    /// Provides TeamCity environment information for current build
+    /// Provides TeamCity environment information for current build.
     /// </summary>
     public class TeamCityEnvironmentInfo : TeamCityInfo
     {
@@ -17,7 +18,7 @@ namespace Cake.Common.Build.TeamCity.Data
         /// <value>
         /// The TeamCity project information.
         /// </value>
-        /// <para>Via BuildSystem</para>
+        /// <para>Via BuildSystem.</para>
         /// <example>
         /// <code>
         /// if (BuildSystem.TeamCity.IsRunningOnTeamCity)
@@ -34,7 +35,7 @@ namespace Cake.Common.Build.TeamCity.Data
         /// }
         /// </code>
         /// </example>
-        /// <para>Via TeamCity</para>
+        /// <para>Via TeamCity.</para>
         /// <example>
         /// <code>
         /// if (TeamCity.IsRunningOnTeamCity)
@@ -59,7 +60,7 @@ namespace Cake.Common.Build.TeamCity.Data
         /// <value>
         /// The TeamCity build information.
         /// </value>
-        /// <para>Via BuildSystem</para>
+        /// <para>Via BuildSystem.</para>
         /// <example>
         /// <code>
         /// if (BuildSystem.TeamCity.IsRunningOnTeamCity)
@@ -78,7 +79,7 @@ namespace Cake.Common.Build.TeamCity.Data
         /// }
         /// </code>
         /// </example>
-        /// <para>Via TeamCity</para>
+        /// <para>Via TeamCity.</para>
         /// <example>
         /// <code>
         /// if (TeamCity.IsRunningOnTeamCity)
@@ -105,7 +106,7 @@ namespace Cake.Common.Build.TeamCity.Data
         /// <value>
         /// The TeamCity pull-request information.
         /// </value>
-        /// <para>Via BuildSystem</para>
+        /// <para>Via BuildSystem.</para>
         /// <example>
         /// <code>
         /// if (BuildSystem.TeamCity.IsRunningOnTeamCity)
@@ -124,7 +125,7 @@ namespace Cake.Common.Build.TeamCity.Data
         /// }
         /// </code>
         /// </example>
-        /// <para>Via TeamCity</para>
+        /// <para>Via TeamCity.</para>
         /// <example>
         /// <code>
         /// if (TeamCity.IsRunningOnTeamCity)
@@ -149,12 +150,13 @@ namespace Cake.Common.Build.TeamCity.Data
         /// Initializes a new instance of the <see cref="TeamCityEnvironmentInfo"/> class.
         /// </summary>
         /// <param name="environment">The environment.</param>
-        public TeamCityEnvironmentInfo(ICakeEnvironment environment)
+        /// <param name="fileSystem">The file system.</param>
+        public TeamCityEnvironmentInfo(ICakeEnvironment environment, IFileSystem fileSystem)
             : base(environment)
         {
             Project = new TeamCityProjectInfo(environment);
-            Build = new TeamCityBuildInfo(environment);
-            PullRequest = new TeamCityPullRequestInfo(environment);
+            Build = new TeamCityBuildInfo(environment, fileSystem);
+            PullRequest = new TeamCityPullRequestInfo(environment, Build);
         }
     }
 }

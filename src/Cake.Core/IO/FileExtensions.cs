@@ -76,11 +76,11 @@ namespace Cake.Core.IO
         }
 
         /// <summary>
-        /// Enumerates line in file
+        /// Enumerates line in file.
         /// </summary>
         /// <param name="file">The file to be read from.</param>
         /// <param name="encoding">The encoding that is applied to the content of the file.</param>
-        /// <returns>A <see cref="IEnumerable{T}"/> of file line content</returns>
+        /// <returns>A <see cref="IEnumerable{T}"/> of file line content.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
         public static IEnumerable<string> ReadLines(this IFile file, System.Text.Encoding encoding)
         {
@@ -130,11 +130,18 @@ namespace Cake.Core.IO
                     fs.Position = 0x3C;
 
                     // Go to Magic header
-                    fs.Position = reader.ReadUInt32() + MagicOffset;
+                    long offset = reader.ReadUInt32() + MagicOffset;
+
+                    if (offset + sizeof(UInt16) > fs.Length)
+                    {
+                        return false;
+                    }
+
+                    fs.Position = offset;
 
                     // Check magic to get 32 / 64 bit offset
                     var is32Bit = reader.ReadUInt16() == Magic32Bit;
-                    var offset = fs.Position + (is32Bit ? Offset32Bit : Offset64Bit) + OffsetDictionary;
+                    offset = fs.Position + (is32Bit ? Offset32Bit : Offset64Bit) + OffsetDictionary;
 
                     if (offset + 4 > fs.Length)
                     {

@@ -3,10 +3,13 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Collections.Generic;
+using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Core.Tests.Fixtures;
 using Cake.Core.Tooling;
 using Cake.Testing;
+using Cake.Testing.Xunit;
 using NSubstitute;
 using Xunit;
 
@@ -82,7 +85,7 @@ namespace Cake.Core.Tests.Unit.Tooling
                 var fixture = new ToolResolutionStrategyFixture();
 
                 // When
-                var result = Record.Exception(() => fixture.Resolve(null));
+                var result = Record.Exception(() => fixture.Resolve((string)null));
 
                 // Then
                 AssertEx.IsArgumentNullException(result, "tool");
@@ -105,7 +108,36 @@ namespace Cake.Core.Tests.Unit.Tooling
             }
 
             [Fact]
-            public void Should_Prefer_To_Resolve_Tool_From_Repository_If_Possible()
+            public void Should_Throw_If_ToolExeNames_Is_Null()
+            {
+                // Given
+                var fixture = new ToolResolutionStrategyFixture();
+
+                // When
+                var result = Record.Exception(() => fixture.Resolve((IEnumerable<string>)null));
+
+                // Then
+                AssertEx.IsArgumentNullException(result, "toolExeNames");
+            }
+
+            [Theory]
+            [InlineData("")]
+            [InlineData(" ")]
+            [InlineData("\t")]
+            public void Should_Throw_If_ToolExeNames_Is_Empty(string tool)
+            {
+                // Given
+                var fixture = new ToolResolutionStrategyFixture();
+
+                // When
+                var result = Record.Exception(() => fixture.Resolve(new[] { tool }));
+
+                // Then
+                AssertEx.IsArgumentException(result, "toolExeNames", "Tool names cannot be empty.");
+            }
+
+            [Fact]
+            public void Should_Prefer_Tool_From_Repository()
             {
                 // Given
                 var fixture = new ToolResolutionStrategyFixture();
@@ -122,7 +154,7 @@ namespace Cake.Core.Tests.Unit.Tooling
             }
 
             [Fact]
-            public void Should_Resolve_Tool_From_Tools_Directory_If_Not_Present_In_Repository()
+            public void Should_Return_Tool_From_Tools_Directory_If_Not_Present_In_Repository()
             {
                 // Given
                 var fixture = new ToolResolutionStrategyFixture();
@@ -138,7 +170,7 @@ namespace Cake.Core.Tests.Unit.Tooling
             }
 
             [Fact]
-            public void Should_Resolve_Tool_From_Tools_Directory_Specified_In_Configuration_If_Not_Present_In_Repository()
+            public void Should_Return_Tool_From_Tools_Directory_Specified_In_Configuration_If_Not_Present_In_Repository()
             {
                 // Given
                 var fixture = new ToolResolutionStrategyFixture();
@@ -155,7 +187,7 @@ namespace Cake.Core.Tests.Unit.Tooling
             }
 
             [Fact]
-            public void Should_Resolve_Tool_From_Environment_Variable_If_Not_Present_In_Tools_Directory()
+            public void Should_Return_Tool_From_Environment_Variable_If_Not_Present_In_Tools_Directory()
             {
                 // Given
                 var fixture = new ToolResolutionStrategyFixture();
@@ -183,7 +215,7 @@ namespace Cake.Core.Tests.Unit.Tooling
             }
 
             [Fact]
-            public void Should_Resolve_Tool_From_Environment_Variable_Gracefully_Proceed_If_FileSystem_Throw_Exception()
+            public void Should_Return_Tool_From_Environment_Variable_Gracefully_Proceed_If_FileSystem_Throw_Exception()
             {
                 // Given
                 var fixture = new ToolResolutionStrategyFixture();
@@ -201,7 +233,7 @@ namespace Cake.Core.Tests.Unit.Tooling
                     return fixture.FileSystem.GetFile(path);
                 });
 
-                var strategy = new ToolResolutionStrategy(fileSystem, fixture.Environment, fixture.Globber, fixture.Configuration);
+                var strategy = new ToolResolutionStrategy(fileSystem, fixture.Environment, fixture.Globber, fixture.Configuration, new NullLog());
 
                 // When
                 var result = strategy.Resolve(fixture.Repository, "tool.exe");
@@ -210,6 +242,120 @@ namespace Cake.Core.Tests.Unit.Tooling
                 Assert.Equal("/Working/temp/tool.exe", result.FullPath);
                 fileSystem.Received().GetFile(Arg.Is<FilePath>(p => p.FullPath == "/Working/fail/tool.exe"));
                 fileSystem.Received().GetFile(Arg.Is<FilePath>(p => p.FullPath == "/Working/temp/tool.exe"));
+            }
+
+            [Fact]
+            public void Should_Prefer_ToolExeNames_From_Repository()
+            {
+                // Given
+                var fixture = new ToolResolutionStrategyFixture();
+                fixture.Repository.Register("./dotnet-tool.exe");
+                fixture.FileSystem.CreateFile("/Working/tools/tool.exe");
+                fixture.FileSystem.CreateFile("/Working/temp/tool.exe");
+                fixture.Environment.SetEnvironmentVariable("PATH", "/Working/temp");
+
+                // When
+                var result = fixture.Resolve(new[] { "tool.exe", "dotnet-tool", "dotnet-tool.exe" });
+
+                // Then
+                Assert.Equal("/Working/dotnet-tool.exe", result.FullPath);
+            }
+
+            [Theory]
+            [InlineData("tool.bat")]
+            [InlineData("tool.cmd")]
+            [InlineData("tool.exe")]
+            public void Should_Prefer_ToolExeNames_With_Unix_Platform_Affinity_When_Unix_Environment(string windowsTool)
+            {
+                // Given
+                var fixture = new ToolResolutionStrategyFixture();
+                fixture.Repository.Register($"./{windowsTool}");
+                fixture.Repository.Register("./tool");
+
+                // When
+                var result = fixture.Resolve(new[] { windowsTool, "tool" });
+
+                // Then
+                Assert.Equal("/Working/tool", result.FullPath);
+            }
+
+            [WindowsTheory]
+            [InlineData("tool.bat")]
+            [InlineData("tool.cmd")]
+            [InlineData("tool.exe")]
+            public void Should_Prefer_ToolExeNames_With_Windows_Platform_Affinity_When_Windows_Environment(string windowsTool)
+            {
+                // Given
+                var fixture = new ToolResolutionStrategyFixture(FakeEnvironment.CreateWindowsEnvironment());
+                fixture.Repository.Register("./tool");
+                fixture.Repository.Register($"./{windowsTool}");
+
+                // When
+                var result = fixture.Resolve(new[] { "tool", windowsTool });
+
+                // Then
+                Assert.Equal($"C:/Working/{windowsTool}", result.FullPath);
+            }
+
+            [Fact]
+            public void Should_Return_ToolExeNames_From_Tools_Directory_If_Not_Present_In_Repository()
+            {
+                // Given
+                var fixture = new ToolResolutionStrategyFixture();
+                fixture.FileSystem.CreateFile("/Working/tools/dotnet-tool.exe");
+                fixture.FileSystem.CreateFile("/Working/temp/tool.exe");
+                fixture.Environment.SetEnvironmentVariable("PATH", "/Working/temp");
+
+                // When
+                var result = fixture.Resolve(new[] { "tool.exe", "dotnet-tool", "dotnet-tool.exe" });
+
+                // Then
+                Assert.Equal("/Working/tools/dotnet-tool.exe", result.FullPath);
+            }
+
+            [Fact]
+            public void Should_Return_ToolExeNames_From_Tools_Directory_Specified_In_Configuration_If_Not_Present_In_Repository()
+            {
+                // Given
+                var fixture = new ToolResolutionStrategyFixture();
+                fixture.Configuration.SetValue(Constants.Paths.Tools, "./stuff");
+                fixture.FileSystem.CreateFile("/Working/stuff/dotnet-tool.exe");
+                fixture.FileSystem.CreateFile("/Working/temp/tool.exe");
+                fixture.Environment.SetEnvironmentVariable("PATH", "/Working/temp");
+
+                // When
+                var result = fixture.Resolve(new[] { "tool.exe", "dotnet-tool", "dotnet-tool.exe" });
+
+                // Then
+                Assert.Equal("/Working/stuff/dotnet-tool.exe", result.FullPath);
+            }
+
+            [Fact]
+            public void Should_Return_ToolExeNames_From_Environment_Variable_If_Not_Present_In_Tools_Directory()
+            {
+                // Given
+                var fixture = new ToolResolutionStrategyFixture();
+                fixture.FileSystem.CreateFile("/Working/temp/dotnet-tool.exe");
+                fixture.Environment.SetEnvironmentVariable("PATH", "/Working/temp");
+
+                // When
+                var result = fixture.Resolve(new[] { "tool.exe", "dotnet-tool", "dotnet-tool.exe" });
+
+                // Then
+                Assert.Equal("/Working/temp/dotnet-tool.exe", result.FullPath);
+            }
+
+            [Fact]
+            public void Should_Return_Null_If_ToolExeNames_Could_Not_Be_Resolved()
+            {
+                // Given
+                var fixture = new ToolResolutionStrategyFixture();
+
+                // When
+                var result = fixture.Resolve(new[] { "tool.exe", "dotnet-tool", "dotnet-tool.exe" });
+
+                // Then
+                Assert.Null(result);
             }
         }
     }

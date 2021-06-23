@@ -4,6 +4,8 @@
 
 using System;
 #if NETCORE
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 #endif
 using System.Runtime.Versioning;
@@ -15,7 +17,9 @@ namespace Cake.Core.Polyfill
 #if !NETCORE
         private static bool? _isRunningOnMac;
 #else
+        private static readonly FrameworkName NetStandardFramework = new FrameworkName(".NETStandard,Version=v2.0");
         private static bool? _isCoreClr;
+        private static FrameworkName netCoreAppFramwork;
 #endif
 
         public static bool Is64BitOperativeSystem()
@@ -88,12 +92,18 @@ namespace Cake.Core.Polyfill
 #if NETCORE
             if (_isCoreClr == null)
             {
-                _isCoreClr = RuntimeInformation.FrameworkDescription.StartsWith(".NET Core");
+                _isCoreClr = Environment.Version.Major >= 5
+                             || RuntimeInformation.FrameworkDescription.StartsWith(".NET Core");
             }
             return _isCoreClr.Value;
 #else
             return false;
 #endif
+        }
+
+        public static bool IsWindows(PlatformFamily family)
+        {
+            return family == PlatformFamily.Windows;
         }
 
         public static bool IsUnix()
@@ -105,6 +115,16 @@ namespace Cake.Core.Polyfill
         {
             return family == PlatformFamily.Linux
                    || family == PlatformFamily.OSX;
+        }
+
+        public static bool IsOSX(PlatformFamily family)
+        {
+            return family == PlatformFamily.OSX;
+        }
+
+        public static bool IsLinux(PlatformFamily family)
+        {
+            return family == PlatformFamily.Linux;
         }
 
         public static Runtime GetRuntime()
@@ -119,7 +139,36 @@ namespace Cake.Core.Polyfill
         public static FrameworkName GetBuiltFramework()
         {
 #if NETCORE
-            return new FrameworkName(".NETStandard,Version=v2.0");
+            if (netCoreAppFramwork != null)
+            {
+                return netCoreAppFramwork;
+            }
+
+            var assemblyPath = typeof(System.Runtime.GCSettings)?.GetTypeInfo()
+                ?.Assembly
+#if NET5_0
+                ?.Location;
+#else
+#pragma warning disable 0618
+                ?.CodeBase;
+#pragma warning restore 0618
+#endif
+            if (string.IsNullOrEmpty(assemblyPath))
+            {
+                return NetStandardFramework;
+            }
+
+            const string microsoftNetCoreApp = "Microsoft.NETCore.App";
+            var runtimeBasePathLength = assemblyPath.IndexOf(microsoftNetCoreApp) + microsoftNetCoreApp.Length + 1;
+            var netCoreAppVersion = string.Concat(assemblyPath.Skip(runtimeBasePathLength).Take(3));
+            if (string.IsNullOrEmpty(netCoreAppVersion))
+            {
+                return NetStandardFramework;
+            }
+
+            return netCoreAppFramwork = Version.TryParse(netCoreAppVersion, out var version)
+                                            ? new FrameworkName(".NETCoreApp", version)
+                                            : NetStandardFramework;
 #else
             return new FrameworkName(".NETFramework,Version=v4.6.1");
 #endif

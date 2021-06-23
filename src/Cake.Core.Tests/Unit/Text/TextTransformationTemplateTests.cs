@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using Cake.Core.Tests.Fixtures;
 using Cake.Core.Text;
 using Xunit;
 
@@ -52,7 +53,7 @@ namespace Cake.Core.Tests.Unit.Text
                 // Then
                 Assert.IsType<ArgumentException>(result);
                 Assert.Equal("key", ((ArgumentException)result)?.ParamName);
-                Assert.Equal($"Key cannot be empty.", result.Message?.SplitLines()[0]);
+                Assert.StartsWith("Key cannot be empty", result.Message?.SplitLines()[0]);
             }
 
             [Theory]
@@ -173,8 +174,9 @@ namespace Cake.Core.Tests.Unit.Text
             public void Should_Return_Key_If_The_Value_Was_Not_Formattable()
             {
                 // Given
+                var notFormattable = new NotFormattableFixture();
                 var transformation = new TextTransformationTemplate("Hello <%pointer:foo%>");
-                transformation.Register("pointer", IntPtr.Zero);
+                transformation.Register("pointer", notFormattable);
 
                 // When
                 var result = transformation.Render();
@@ -187,9 +189,10 @@ namespace Cake.Core.Tests.Unit.Text
             public void Should_Return_Key_If_The_Value_Was_Not_Formattable_With_Different_Placeholder()
             {
                 // Given
+                var notFormattable = new NotFormattableFixture();
                 var placeholder = new Tuple<string, string>("{{", "}}");
                 var transformation = new TextTransformationTemplate("Hello {{pointer:foo}}", placeholder);
-                transformation.Register("pointer", IntPtr.Zero);
+                transformation.Register("pointer", notFormattable);
 
                 // When
                 var result = transformation.Render();

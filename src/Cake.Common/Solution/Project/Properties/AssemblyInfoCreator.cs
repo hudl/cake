@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -61,8 +61,20 @@ namespace Cake.Common.Solution.Project.Properties
         /// </summary>
         /// <param name="outputPath">The output path.</param>
         /// <param name="settings">The settings.</param>
+        /// <param name="attributeFormat">The attribute format.</param>
+        /// <param name="attributeWithValueFormat">The attribute with value format.</param>
+        /// <param name="attributeWithKeyValueFormat">The attribute with key value format.</param>
+        /// <param name="vbAttributeFormat">The VB attribute format.</param>
+        /// <param name="vbAttributeWithValueFormat">The VB attribute with value format.</param>
+        /// <param name="vbAttributeWithKeyValueFormat">The VB attribute with key value format.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
-        public void Create(FilePath outputPath, AssemblyInfoSettings settings)
+        public void Create(FilePath outputPath, AssemblyInfoSettings settings,
+            string attributeFormat = CSharpAttributeFormat,
+            string attributeWithValueFormat = CSharpAttributeWithValueFormat,
+            string attributeWithKeyValueFormat = CSharpAttributeWithKeyValueFormat,
+            string vbAttributeFormat = VBAttributeFormat,
+            string vbAttributeWithValueFormat = VBAttributeWithValueFormat,
+            string vbAttributeWithKeyValueFormat = VBAttributeWithKeyValueFormat)
         {
             if (outputPath == null)
             {
@@ -74,19 +86,20 @@ namespace Cake.Common.Solution.Project.Properties
             }
             string comment = CSharpComment;
             string usingFormat = CSharpUsingFormat;
-            string attributeFormat = CSharpAttributeFormat;
-            string attributeWithValueFormat = CSharpAttributeWithValueFormat;
-            string attributeWithKeyValueFormat = CSharpAttributeWithKeyValueFormat;
+
+            var isVisualBasicAssemblyInfoFile = false;
 
             if (outputPath.GetExtension() == ".vb")
             {
+                isVisualBasicAssemblyInfoFile = true;
                 comment = VBComment;
                 usingFormat = VBUsingFormat;
-                attributeFormat = VBAttributeFormat;
-                attributeWithValueFormat = VBAttributeWithValueFormat;
-                attributeWithKeyValueFormat = VBAttributeWithKeyValueFormat;
+                attributeFormat = vbAttributeFormat;
+                attributeWithValueFormat = vbAttributeWithValueFormat;
+                attributeWithKeyValueFormat = vbAttributeWithKeyValueFormat;
             }
-            var data = new AssemblyInfoCreatorData(settings);
+
+            var data = new AssemblyInfoCreatorData(settings, isVisualBasicAssemblyInfoFile);
 
             outputPath = outputPath.MakeAbsolute(_environment);
             _log.Verbose("Creating assembly info file: {0}", outputPath);

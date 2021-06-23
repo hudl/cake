@@ -98,6 +98,36 @@ namespace Cake.Common.Tests.Unit.Tools.MSBuild
             }
         }
 
+        public sealed class TheSetPlatformTargetStringMethod
+        {
+            [Fact]
+            public void Should_Set_Platform_Target_Via_Property()
+            {
+                // Given
+                var settings = new MSBuildSettings();
+
+                // When
+                settings.SetPlatformTarget("Custom");
+
+                // Then
+                Assert.True(settings.Properties.ContainsKey("Platform"));
+                Assert.Equal("Custom", string.Join(string.Empty, settings.Properties["Platform"]));
+            }
+
+            [Fact]
+            public void Should_Return_The_Same_Configuration()
+            {
+                // Given
+                var settings = new MSBuildSettings();
+
+                // When
+                var result = settings.SetPlatformTarget("Custom");
+
+                // Then
+                Assert.Equal(settings, result);
+            }
+        }
+
         public sealed class TheWithPropertyMethod
         {
             [Fact]
@@ -490,6 +520,38 @@ namespace Cake.Common.Tests.Unit.Tools.MSBuild
                 // Then
                 Assert.Equal(settings, result);
                 Assert.Equal(settings, result1);
+            }
+        }
+
+        public sealed class TheEnableBinaryLoggerMethod
+        {
+            [Fact]
+            public void Should_Enable_BinaryLogger()
+            {
+                // Given
+                var settings = new MSBuildSettings();
+
+                // When
+                settings.EnableBinaryLogger();
+
+                // Then
+                Assert.NotNull(settings.BinaryLogger);
+                Assert.True(settings.BinaryLogger.Enabled);
+                Assert.Null(settings.BinaryLogger.FileName);
+                Assert.Equal(MSBuildBinaryLogImports.Unspecified, settings.BinaryLogger.Imports);
+            }
+
+            [Fact]
+            public void Should_Return_The_Same_Configuration()
+            {
+                // Given
+                var settings = new MSBuildSettings();
+
+                // When
+                var result = settings.EnableBinaryLogger();
+
+                // Then
+                Assert.Equal(settings, result);
             }
         }
 

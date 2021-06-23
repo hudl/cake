@@ -20,77 +20,44 @@ namespace Cake.Common.Build.GoCD
     /// </summary>
     public sealed class GoCDProvider : IGoCDProvider
     {
-        private readonly ICakeLog _cakeLog;
         private readonly ICakeEnvironment _environment;
+        private readonly ICakeLog _log;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GoCDProvider" /> class.
         /// </summary>
         /// <param name="environment">The environment.</param>
-        /// <param name="cakeLog">The cake log.</param>
-        public GoCDProvider(ICakeEnvironment environment, ICakeLog cakeLog)
+        /// <param name="log">The cake log.</param>
+        public GoCDProvider(ICakeEnvironment environment, ICakeLog log)
         {
-            if (environment == null)
-            {
-                throw new ArgumentNullException(nameof(environment));
-            }
-
-            if (cakeLog == null)
-            {
-                throw new ArgumentNullException(nameof(cakeLog));
-            }
-
-            _environment = environment;
-            _cakeLog = cakeLog;
+            _environment = environment ?? throw new ArgumentNullException(nameof(environment));
+            _log = log ?? throw new ArgumentNullException(nameof(log));
             Environment = new GoCDEnvironmentInfo(environment);
         }
 
-         /// <summary>
-        /// Gets a value indicating whether the current build is running on Go.CD.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if the current build is running on Go.CD.; otherwise, <c>false</c>.
-        /// </value>
+        /// <inheritdoc/>
         public bool IsRunningOnGoCD => !string.IsNullOrWhiteSpace(_environment.GetEnvironmentVariable("GO_SERVER_URL"));
 
-        /// <summary>
-        /// Gets the Go.CD environment.
-        /// </summary>
-        /// <value>
-        /// The Go.CD environment.
-        /// </value>
+        /// <inheritdoc/>
         public GoCDEnvironmentInfo Environment { get; }
 
-        /// <summary>
-        /// Gets the Go.CD build history, including the repository modifications that caused the pipeline to start.
-        /// </summary>
-        /// <param name="username">The Go.CD username.</param>
-        /// <param name="password">The Go.CD password.</param>
-        /// <returns>The Go.CD build history.</returns>
+        /// <inheritdoc/>
         public GoCDHistoryInfo GetHistory(string username, string password)
         {
             return GetHistory(username, password, Environment.GoCDUrl);
         }
 
-        /// <summary>
-        /// Gets the Go.CD build history, including the repository modifications that caused the pipeline to start.
-        /// </summary>
-        /// <param name="username">The Go.CD username.</param>
-        /// <param name="password">The Go.CD password.</param>
-        /// <param name="serverUrl">The Go.CD server URL.</param>
-        /// <returns>The Go.CD build history.</returns>
+        /// <inheritdoc/>
         public GoCDHistoryInfo GetHistory(string username, string password, string serverUrl)
         {
             if (username == null)
             {
                 throw new ArgumentNullException(nameof(username));
             }
-
             if (password == null)
             {
                 throw new ArgumentNullException(nameof(password));
             }
-
             if (serverUrl == null)
             {
                 throw new ArgumentNullException(nameof(serverUrl));
@@ -105,9 +72,9 @@ namespace Cake.Common.Build.GoCD
                 CultureInfo.InvariantCulture,
                 "{0}/go/api/pipelines/{1}/history/0",
                 serverUrl,
-                this.Environment.Pipeline.Name).ToLowerInvariant());
+                Environment.Pipeline.Name).ToLowerInvariant());
 
-            _cakeLog.Write(Verbosity.Diagnostic, LogLevel.Verbose, "Getting [{0}]", url);
+            _log.Write(Verbosity.Diagnostic, LogLevel.Verbose, "Getting [{0}]", url);
             return Task.Run(async () =>
             {
                 var encodedCredentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(
@@ -119,7 +86,7 @@ namespace Cake.Common.Build.GoCD
                         string.Format(CultureInfo.InvariantCulture, "Basic {0}", encodedCredentials));
                     var response = await client.GetAsync(url);
                     var content = await response.Content.ReadAsStringAsync();
-                    _cakeLog.Write(Verbosity.Diagnostic, LogLevel.Verbose, "Server response [{0}:{1}]:\n\r{2}", response.StatusCode, response.ReasonPhrase, content);
+                    _log.Write(Verbosity.Diagnostic, LogLevel.Verbose, "Server response [{0}:{1}]:\n\r{2}", response.StatusCode, response.ReasonPhrase, content);
 
                     var jsonSerializer = new DataContractJsonSerializer(typeof(GoCDHistoryInfo));
 

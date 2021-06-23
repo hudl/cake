@@ -21,28 +21,14 @@ namespace Cake.Common.Build.Bamboo
         /// <param name="environment">The environment.</param>
         public BambooProvider(ICakeEnvironment environment)
         {
-            if (environment == null)
-            {
-                throw new ArgumentNullException(nameof(environment));
-            }
-            _environment = environment;
+            _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             Environment = new BambooEnvironmentInfo(environment);
         }
 
-         /// <summary>
-        /// Gets a value indicating whether the current build is running on Bamboo.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if the current build is running on Bamboo.; otherwise, <c>false</c>.
-        /// </value>
+        /// <inheritdoc/>
         public bool IsRunningOnBamboo => !string.IsNullOrWhiteSpace(_environment.GetEnvironmentVariable("bamboo_buildNumber"));
 
-        /// <summary>
-        /// Gets the Bamboo environment.
-        /// </summary>
-        /// <value>
-        /// The Bamboo environment.
-        /// </value>
+        /// <inheritdoc/>
         public BambooEnvironmentInfo Environment { get; }
     }
 }

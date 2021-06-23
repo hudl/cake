@@ -6,7 +6,6 @@ using System;
 using Cake.Common.Build.TeamCity;
 using Cake.Common.Tests.Fixtures.Build;
 using Cake.Core.IO;
-using Cake.Testing.Extensions;
 using Xunit;
 
 namespace Cake.Common.Tests.Unit.Build.TeamCity
@@ -19,23 +18,36 @@ namespace Cake.Common.Tests.Unit.Build.TeamCity
             public void Should_Throw_If_Environment_Is_Null()
             {
                 // Given, When
-                var result = Record.Exception(() => new TeamCityProvider(null, null));
+                var result = Record.Exception(() => new TeamCityProvider(null, null, null));
 
                 // Then
                 AssertEx.IsArgumentNullException(result, "environment");
             }
 
             [Fact]
-            public void Should_Throw_If_Log_Is_Null()
+            public void Should_Throw_If_FileSystem_Is_Null()
             {
                 // Given
                 var fixture = new TeamCityFixture();
 
                 // When
-                var result = Record.Exception(() => new TeamCityProvider(fixture.Environment, null));
+                var result = Record.Exception(() => new TeamCityProvider(fixture.Environment, null, null));
 
                 // Then
-                AssertEx.IsArgumentNullException(result, "log");
+                AssertEx.IsArgumentNullException(result, "fileSystem");
+            }
+
+            [Fact]
+            public void Should_Throw_If_Writer_Is_Null()
+            {
+                // Given
+                var fixture = new TeamCityFixture();
+
+                // When
+                var result = Record.Exception(() => new TeamCityProvider(fixture.Environment, fixture.FileSystem, null));
+
+                // Then
+                AssertEx.IsArgumentNullException(result, "writer");
             }
         }
 
@@ -88,7 +100,7 @@ namespace Cake.Common.Tests.Unit.Build.TeamCity
                 // Then
                 Assert.Equal("##teamcity[dotNetCoverage ]" + Environment.NewLine +
                     "##teamcity[importData type='dotNetCoverage' tool='dotcover' path='/path/to/result.dcvr']" + Environment.NewLine,
-                    fixture.Log.AggregateLogMessages());
+                    fixture.Writer.GetOutput());
             }
 
             [Fact]
@@ -107,7 +119,7 @@ namespace Cake.Common.Tests.Unit.Build.TeamCity
                 // Then
                 Assert.Equal("##teamcity[dotNetCoverage dotcover_home='/path/to/dotcover_home']" + Environment.NewLine +
                     "##teamcity[importData type='dotNetCoverage' tool='dotcover' path='/path/to/result.dcvr']" + Environment.NewLine,
-                    fixture.Log.AggregateLogMessages());
+                    fixture.Writer.GetOutput());
             }
         }
 
@@ -125,7 +137,7 @@ namespace Cake.Common.Tests.Unit.Build.TeamCity
 
                 // Then
                 Assert.Equal("##teamcity[setParameter name='internal.artifactVersion' value='1.2.3.4']" + Environment.NewLine,
-                    fixture.Log.AggregateLogMessages());
+                    fixture.Writer.GetOutput());
             }
         }
 
@@ -146,7 +158,7 @@ namespace Cake.Common.Tests.Unit.Build.TeamCity
 
                 // Then
                 Assert.Equal($"##teamcity[buildProblem {expected}]" + Environment.NewLine,
-                    fixture.Log.AggregateLogMessages());
+                    fixture.Writer.GetOutput());
             }
         }
     }

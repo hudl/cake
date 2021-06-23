@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using Cake.Core;
 
 namespace Cake.Common.Build.MyGet
@@ -18,42 +19,40 @@ namespace Cake.Common.Build.MyGet
     {
         private const string MessagePrefix = "##myget[";
         private const string MessagePostfix = "]";
-        private static readonly Dictionary<string, string> _sanitizationTokens;
+
+        private static readonly Dictionary<char, string> _sanitizationTokens;
+        private static readonly char[] _specialCharacters;
+
         private readonly ICakeEnvironment _environment;
+        private readonly IBuildSystemServiceMessageWriter _writer;
 
         static MyGetProvider()
         {
-            _sanitizationTokens = new Dictionary<string, string>
+            _sanitizationTokens = new Dictionary<char, string>
             {
-                { "|", "||" },
-                { "\'", "|\'" },
-                { "\n", "|n" },
-                { "\r", "|r" },
-                { "[", "|['" },
-                { "]", "|]" }
+                { '|', "||" },
+                { '\'', "|\'" },
+                { '\n', "|n" },
+                { '\r', "|r" },
+                { '[', "|[" },
+                { ']', "|]" }
             };
+
+            _specialCharacters = _sanitizationTokens.Keys.ToArray();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MyGetProvider"/> class.
         /// </summary>
         /// <param name="environment">The cake environment.</param>
-        public MyGetProvider(ICakeEnvironment environment)
+        /// <param name="writer">The build system service message writer.</param>
+        public MyGetProvider(ICakeEnvironment environment, IBuildSystemServiceMessageWriter writer)
         {
-            if (environment == null)
-            {
-                throw new ArgumentNullException(nameof(environment));
-            }
-
-            _environment = environment;
+            _environment = environment ?? throw new ArgumentNullException(nameof(environment));
+            _writer = writer ?? throw new ArgumentNullException(nameof(writer));
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the current build is running on MyGet.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if the current build is running on MyGet; otherwise, <c>false</c>.
-        /// </value>
+        /// <inheritdoc/>
         public bool IsRunningOnMyGet
         {
             get
@@ -63,20 +62,13 @@ namespace Cake.Common.Build.MyGet
             }
         }
 
-        /// <summary>
-        /// Report a build problem to MyGet.
-        /// </summary>
-        /// <param name="description">Description of build problem.</param>
+        /// <inheritdoc/>
         public void BuildProblem(string description)
         {
             WriteServiceMessage("buildProblem", "description", description);
         }
 
-        /// <summary>
-        /// Allows setting an environment variable that can be used by a future process.
-        /// </summary>
-        /// <param name="name">Name of the parameter to set.</param>
-        /// <param name="value">Value to assign to the parameter.</param>
+        /// <inheritdoc/>
         public void SetParameter(string name, string value)
         {
             WriteServiceMessage("setParameter", new Dictionary<string, string>
@@ -86,12 +78,7 @@ namespace Cake.Common.Build.MyGet
             });
         }
 
-        /// <summary>
-        /// Write a status message to the MyGet build log.
-        /// </summary>
-        /// <param name="message">Message contents.</param>
-        /// <param name="status">Build status.</param>
-        /// <param name="errorDetails">Error details if status is error.</param>
+        /// <inheritdoc/>
         public void WriteStatus(string message, MyGetBuildStatus status, string errorDetails = null)
         {
             var statusToWrite = string.Empty;
@@ -126,52 +113,71 @@ namespace Cake.Common.Build.MyGet
             WriteServiceMessage("message", attrs);
         }
 
-        /// <summary>
-        /// Tells MyGet to change the current build number.
-        /// </summary>
-        /// <param name="buildNumber">The required build number.</param>
+        /// <inheritdoc/>
         public void SetBuildNumber(string buildNumber)
         {
             WriteServiceMessage("buildNumber", buildNumber);
         }
 
-        private static void WriteServiceMessage(string messageName, string attributeValue)
+        private void WriteServiceMessage(string messageName, string attributeValue)
         {
-            WriteServiceMessage(messageName, new Dictionary<string, string> { { " ", attributeValue } });
+            WriteServiceMessage(messageName, new Dictionary<string, string> { { string.Empty, attributeValue } });
         }
 
-        private static void WriteServiceMessage(string messageName, string attributeName, string attributeValue)
+        private void WriteServiceMessage(string messageName, string attributeName, string attributeValue)
         {
             WriteServiceMessage(messageName, new Dictionary<string, string> { { attributeName, attributeValue } });
         }
 
         [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1118:ParameterMustNotSpanMultipleLines", Justification = "Reviewed.")]
-        private static void WriteServiceMessage(string messageName, Dictionary<string, string> values)
+        private void WriteServiceMessage(string messageName, Dictionary<string, string> values)
         {
             var valueString =
                 string.Join(" ",
                     values
                         .Select(keypair =>
                         {
-                            if (string.IsNullOrWhiteSpace(keypair.Key))
+                            var sanitizedValue = Sanitize(keypair.Value);
+                            if (string.IsNullOrEmpty(keypair.Key))
                             {
-                                return string.Format(CultureInfo.InvariantCulture, "'{0}'", Sanitize(keypair.Value));
+                                return string.Format(CultureInfo.InvariantCulture, "'{0}'", sanitizedValue);
                             }
-                            return string.Format(CultureInfo.InvariantCulture, "{0}='{1}'", keypair.Key, Sanitize(keypair.Value));
+                            return string.Format(CultureInfo.InvariantCulture, "{0}='{1}'", keypair.Key, sanitizedValue);
                         })
                         .ToArray());
 
-            Console.WriteLine("{0}{1} {2}{3}", MessagePrefix, messageName, valueString, MessagePostfix);
+            _writer.Write("{0}{1} {2}{3}", MessagePrefix, messageName, valueString, MessagePostfix);
         }
 
         private static string Sanitize(string source)
         {
-            foreach (var charPair in _sanitizationTokens)
+            if (string.IsNullOrEmpty(source))
             {
-                source = source.Replace(charPair.Key, charPair.Value);
+                return string.Empty;
             }
 
-            return source;
+            // When source does not contain special characters, then it is possible to skip building new string.
+            // This approach can possibly iterate through string 2 times, but special characters are exceptional.
+            if (source.IndexOfAny(_specialCharacters) < 0)
+            {
+                return source;
+            }
+
+            var stringBuilder = new StringBuilder(source.Length * 2);
+            for (int index = 0; index < source.Length; index++)
+            {
+                char sourceChar = source[index];
+                if (_sanitizationTokens.TryGetValue(sourceChar, out var replacement))
+                {
+                    stringBuilder.Append(replacement);
+                }
+                else
+                {
+                    stringBuilder.Append(sourceChar);
+                }
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }

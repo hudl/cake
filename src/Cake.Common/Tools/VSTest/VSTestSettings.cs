@@ -64,7 +64,7 @@ namespace Cake.Common.Tools.VSTest
         ///     semantics and is applicable for string properties like DisplayName).
         ///     Parenthesis () can be used to group sub-expressions.
         /// Examples: Priority=1
-        ///           (FullyQualifiedName~Nightly|Name=MyTestMethod)
+        ///           (FullyQualifiedName~Nightly|Name=MyTestMethod).
         /// </summary>
         public string TestCaseFilter { get; set; }
 
@@ -74,11 +74,18 @@ namespace Cake.Common.Tools.VSTest
         public FilePath Diag { get; set; }
 
         /// <summary>
+        /// Gets or sets the result directory.
+        /// Test results directory will be created in specified path if not exists.
+        /// VSTest.Console.exe flag <see href="https://docs.microsoft.com/en-us/visualstudio/test/vstest-console-options#ResultDirectory">/ResultsDirectory</see>.
+        /// </summary>
+        public DirectoryPath ResultsDirectory { get; set; }
+
+        /// <summary>
         /// Gets or sets the name of your logger. Possible values:
         /// - A blank string (or null): no logger
         /// - "trx": Visual Studio's built-in logger
         /// - "AppVeyor": AppVeyor's custom logger which is available only when building your solution on the AppVeyor platform
-        /// - any custom value: the name of your custom logger
+        /// - any custom value: the name of your custom logger.
         /// </summary>
         public string Logger { get; set; }
     }

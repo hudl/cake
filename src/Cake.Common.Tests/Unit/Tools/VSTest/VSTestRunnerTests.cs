@@ -95,6 +95,12 @@ namespace Cake.Common.Tests.Unit.Tools.VSTest
         [InlineData("/ProgramFilesX86/Microsoft Visual Studio 14.0/Common7/IDE/CommonExtensions/Microsoft/TestWindow/vstest.console.exe")]
         [InlineData("/ProgramFilesX86/Microsoft Visual Studio 12.0/Common7/IDE/CommonExtensions/Microsoft/TestWindow/vstest.console.exe")]
         [InlineData("/ProgramFilesX86/Microsoft Visual Studio 11.0/Common7/IDE/CommonExtensions/Microsoft/TestWindow/vstest.console.exe")]
+        [InlineData("/ProgramFilesX86/Microsoft Visual Studio/2017/Enterprise/Common7/IDE/CommonExtensions/Microsoft/TestWindow/vstest.console.exe")]
+        [InlineData("/ProgramFilesX86/Microsoft Visual Studio/2017/Professional/Common7/IDE/CommonExtensions/Microsoft/TestWindow/vstest.console.exe")]
+        [InlineData("/ProgramFilesX86/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/TestWindow/vstest.console.exe")]
+        [InlineData("/ProgramFilesX86/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/CommonExtensions/Microsoft/TestWindow/vstest.console.exe")]
+        [InlineData("/ProgramFilesX86/Microsoft Visual Studio/2019/Professional/Common7/IDE/CommonExtensions/Microsoft/TestWindow/vstest.console.exe")]
+        [InlineData("/ProgramFilesX86/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/TestWindow/vstest.console.exe")]
         public void Should_Use_Available_Tool_Path(string existingToolPath)
         {
             // Given
@@ -247,6 +253,20 @@ namespace Cake.Common.Tests.Unit.Tools.VSTest
 
             // Then
             Assert.Equal("\"/Working/Test1.dll\" /Diag:\"/Working/Path to/diag log.txt\"", result.Args);
+        }
+
+        [Fact]
+        public void Should_Use_ResultsDirectory_If_Provided()
+        {
+            // Given
+            var fixture = new VSTestRunnerFixture();
+            fixture.Settings.ResultsDirectory = new DirectoryPath("./Path to/");
+
+            // When
+            var result = fixture.Run();
+
+            // Then
+            Assert.Equal("\"/Working/Test1.dll\" /ResultsDirectory:\"/Working/Path to\"", result.Args);
         }
 
         [Fact]

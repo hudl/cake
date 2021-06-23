@@ -23,7 +23,7 @@ By contributing to Cake, you assert that:
 * You have the right to assign the copyright for the work (it is not owned by your employer, or
   you have been given copyright assignment in writing).
 * You [license](https://github.com/cake-build/cake/blob/develop/LICENSE) the contribution under the terms applied to the rest of the Cake project.
-* You agree to follow the [code of conduct](https://github.com/cake-build/cake/blob/develop/CODEOFCONDUCT.md).
+* You agree to follow the [code of conduct](https://github.com/cake-build/cake/blob/develop/CODE_OF_CONDUCT.md).
 
 ## Definition of trivial contributions
 It's hard to define what is a trivial contribution. Sometimes even a 1 character change can be considered significant.
@@ -64,9 +64,9 @@ Any new code should also have reasonable unit test coverage.
 ## Contributing process
 ### Get buyoff or find open community issues or features
 
- * Through GitHub, or through the [Gitter chat](https://gitter.im/cake-build/cake) (preferred),
+ * Through GitHub, or through the [GitHub discussions](https://github.com/cake-build/cake/discussions) (preferred),
    you talk about a feature you would like to see (or a bug), and why it should be in Cake.
-   * If approved through the Gitter chat, ensure an accompanying GitHub issue is created with
+   * If approved through the GitHub discussions, ensure an accompanying GitHub issue is created with
      information and a link back to the discussion.
  * Once you get a nod from one of the [Cake Team](https://github.com/cake-build?tab=members), you can start on the feature.
  * Alternatively, if a feature is on the issues list with the

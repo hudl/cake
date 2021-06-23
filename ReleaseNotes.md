@@ -1,3 +1,275 @@
+### New in 1.1.0 (Released 2021/03/06)
+
+* 2983 No possibility of adding variable with isOutput=true in Azure Pipelines
+* 2903 Integrate Cake.DotNetTool.Module
+* 2685 Better dotnet tool integration
+* 3190 Working directory is not respected in BuildContext constructor
+* 3143 ParseSolution throws IndexOutOfRangeException on empty lines
+* 3058 Regression: Tools are no longer not restored in working directory
+* 2852 Terminal output colours
+* 3219 Update nuspec iconUrl in packages to use CDN URL
+* 3216 Remap NuGetLogger Verbose/Verbose to ICakeLog Debug/Diagnostic
+* 3213 Add iconUrl fallback to Cake and Cake.CoreCLR packages
+* 3193 Update Cake unit MS Test SDK dependencies to 16.9.1
+* 3191 Update Roslyn (Microsoft.CodeAnalysis.CSharp.Scripting) to 3.9.0-4.final
+* 3188 Update Cake.NuGet dependencies to latest stable
+* 3144 TeamCity pull request info requires "GIT_BRANCH" environment variable
+* 3133 Add IncludeNativeLibrariesForSelfExtract and IncludeAllContentForSelfExtract to DotNetCorePublishSettings
+* 3127 Add ResultsDirectory to VSTestSettings
+* 3125 ReportGenerator missing report types
+* 3081 Add netcoreapp3.1 target to Cake
+* 3066 Prefer tools with platform affinity
+* 3040 Package ID Prefix Reservation for Cake.* on nuget.org for cake-build organization
+* 3024 WindowsRegistry: Expose other root registry keys to Cake scripts (e.g. HKEY_CURRENT_USER)
+* 2975 Add support for opting out of ANSI coloring via NO_COLOR env. variable
+* 2967 Expose TeamCity build properties dictionary via TeamCityBuildInfo
+* 2966 Enable AnsiConsoleRenderer in TeamCity and Azure Pipelines
+* 2955 Add Build Start Date & Time to TeamCity build information
+* 2941 ProcessArgumentBuilder helpers should return empty builder when values is null
+* 2932 Add dotnet test --blame Flag to DotNetCoreTestSettings
+* 2314 There's no way to set platform like Debug|iPhone
+* 1633 Some command line output ignores system foreground color configuration
+* 2904 (Frosting) Tool installer should respect configuration
+
+### New in 1.0.0 (Released 2021/02/07)
+
+* 3050 Frosting: Rename CakeHost extension from UseTool to InstallTool.
+* 2930 Increase potential breaking change property.
+* 2333 RFC-0001: Rewrite Cake CLI.
+* 2292 Remove obsolete methods and properties.
+* 3020 Migrate to Spectre.Console.
+* 2933 Enable NuGet provider in Frosting.
+* 2874 Merge frosting into main Cake repo.
+* 2883 (Frosting) Add support for .NET 5.
+* 2857 Add support for .NET 5.
+* 2776 Checklist for 1.0.
+* 2755 Add DirectoryHashCalculator.
+* 2199 Add GlobPattern class.
+* 741 Add IsRunningOnMacOs() alias.
+* 3083 Update --tree usage example to match option in the help info.
+* 3069 Don't promote UseWorkingDirectory in Frosting default template.
+* 3029 Add ICakeArguments.GetArgument extension.
+* 3018 Cake displays raw ANSI output after running specific executables.
+* 3009 Make Cake Core CakeDataService Public.
+* 2913 Add overload for DotNetCoreRun.
+* 2908 Future proof .NET [Core] detection.
+* 2897 Add tests for MyGetProvider.
+* 2895 Custom contexts should inherit from CakeContextAdapter.
+* 2877 Add NuGet's Icon setting to NuGetPackSettings.
+* 2870 Add helpers for adding multiple strings to ProcessArgumentBuilder.
+* 2866 Support multiple dotnet test options.
+* 2847 Add new GitHub Actions URL environment variables.
+* 2844 Add missing dotnet test options.
+* 2839 Add support for PublishReadyToRunShowWarnings property in DotNetCorePublish.
+* 2838 Add MakeRelative alias to DirectoryPath and FilePath.
+* 2833 Implicit bootstrapping of modules.
+* 2831 ParseAssemblyInfo does not detect lines with extra spaces.
+* 2886 (Frosting) Support all commands that Cake does.
+* 2825 Add option to ignore tool exit code.
+* 2822 Add support of ReportGenerator global tool.
+* 2820 Add DebuggerStepThroughAttribute to generated code.
+* 2817 Bump dependencies.
+* 2801 Inconsistent NuGet file name case.
+* 2792 Add dotnet nologo options.
+* 2743 Tool resolution for multiple names should be breadth first.
+* 2703 OpenCover is missing hideskipped setting.
+* 2623 DotNetCoreTestSettings Can Have Multiple Logger's.
+* 2595 Misleading output message when trying to install prerelease package with the in-process nuget installer.
+* 2892 (Frosting) Add ANSI console.
+* 2893 (Frosting) Align command line parsing with Cake.
+* 2962 Document breaking changes in 1.0 CLI.
+* 2925 Fix sentences which end with double full stop.
+* 2918 Incorrect link for ReSharper's Open Source webpage in Cake readme.
+* 2894 Remove unnecessary documentation and replace it with .
+* 2879 Update links pointing to cakebuild.net to new URL structure.
+* 2836 Update README with more up-to-date "getting started" information.
+* 2811 Identity of BuildProblem in TeamCityProvider should be optional.
+* 1690 Casing causes 'More than one build script specified.' message.
+* 3077 Regression: rc0003 outputs extra characters on OSX.
+* 3072 Attribute [IsDependeeOf] doesn't work.
+* 3038 Tool resolving in Frosting tasks.
+* 3032 Frosting project fails on Linux.
+* 3007 Different arguments between script runner and Frosting.
+* 2963 EndOfStreamException thrown when using loaddependencies=true.
+* 2961 Update dotnet cake usage instructions (dotnet cake --help).
+* 2956 Wrong Cake version in build.config.
+* 2911 C*  syntax errors in exceptions causes Specre.CLI internal error.
+* 2861 Fix error output in 1.0 preview.
+* 2853 Custom argument names are not case insensitive in 1.0 preview.
+* 2887 (Frosting) Fix line endings in build.sh within template package.
+* 2734 Can't resolve resource assemblies.
+* 2066 cake.coreclr help information error.
+
+### New in 1.0.0-rc0003 (Released 2021/01/29)
+
+* 3029 Add ICakeArguments.GetArgument extension
+* 3007 Different arguments between script runner and Frosting
+* 3018 Cake displays raw ANSI output after running specific executables
+* 3009 Make Cake Core CakeDataService Public
+* 2961 Update dotnet cake usage instructions (dotnet cake --help)
+* 2066 cake.coreclr help information error
+* 3032 Frosting project fails on Linux
+* 3050 Frosting: Rename CakeHost extension from UseTool to InstallTool
+* 3020 Migrate to Spectre.Console
+
+### New in 1.0.0-rc0002 (Released 2020/12/20)
+
+* 2930 Increase potential breaking change property.
+* 2904 (Frosting) Tool installer should respect configuration.
+* 2933 Enable NuGet provider in Frosting.
+* 2838 Add MakeRelative alias to DirectoryPath and FilePath.
+* 2886 (Frosting) Support all commands that Cake does.
+* 2893 (Frosting) Align command line parsing with Cake.
+* 2892 (Frosting) Add ANSI console.
+* 2962 Document breaking changes in 1.0 CLI.
+* 2980 Update to .NET 5 SDK 5.0.101.
+* 2929 GitReleaseManager milestone should use SemVersion.
+* 2928 Cake.Frosting and Cake.Frosting.Template not pushed to NuGet.
+* 2900 Update to .NET 5 SDK "RTM".
+* 2963 EndOfStreamException thrown when using loaddependencies=true.
+* 2956 Wrong Cake version in build.config.
+
+### New in 1.0.0-rc0001 (Released 2020/11/05)
+
+* 2292 Remove obsolete methods and properties.
+* 2874 Merge frosting into main Cake repo.
+* 2883 (Frosting) Add support for .NET 5.
+* 2857 Add support for .NET 5.
+* 2776 Checklist for 1.0.
+* 2755 Add DirectoryHashCalculator.
+* 2333 RFC-0001: Rewrite Cake CLI.
+* 2199 Add GlobPattern class.
+* 741 Add IsRunningOnMacOs() alias.
+* 2913 Add overload for DotNetCoreRun.
+* 2908 Future proof .NET [Core] detection.
+* 2897 Add tests for MyGetProvider.
+* 2895 Custom contexts should inherit from CakeContextAdapter.
+* 2877 Add NuGet's Icon setting to NuGetPackSettings.
+* 2870 Add helpers for adding multiple strings to ProcessArgumentBuilder.
+* 2866 Support multiple dotnet test options.
+* 2847 Add new GitHub Actions URL environment variables.
+* 2844 Add missing dotnet test options.
+* 2839 Add support for PublishReadyToRunShowWarnings property in DotNetCorePublish.
+* 2833 Implicit bootstrapping of modules.
+* 2831 ParseAssemblyInfo does not detect lines with extra spaces.
+* 2825 Add option to ignore tool exit code.
+* 2822 Add support of ReportGenerator global tool.
+* 2820 Add DebuggerStepThroughAttribute to generated code.
+* 2817 Bump dependencies.
+* 2801 Inconsistent NuGet file name case.
+* 2792 Add dotnet nologo options.
+* 2743 Tool resolution for multiple names should be breadth first.
+* 2703 OpenCover is missing hideskipped setting.
+* 2623 DotNetCoreTestSettings Can Have Multiple Logger's.
+* 2595 Misleading output message when trying to install prerelease package with the in-process nuget installer.
+* 2925 Fix sentences which end with double full stop.
+* 2918 Incorrect link for ReSharper's Open Source webpage in Cake readme.
+* 2894 Remove unnecessary documentation and replace it with .
+* 2879 Update links pointing to cakebuild.net to new URL structure.
+* 2836 Update README with more up-to-date "getting started" information.
+* 2811 Identity of BuildProblem in TeamCityProvider should be optional.
+* 2920 Bump Cake script dependencies.
+* 2899 Update to .NET 5 SDK RC 2.
+* 2850 Bump .NET Core SDK to 3.1.402.
+* 2818 Start producing 1.0.0-rc0001 NuGet Packages.
+* 2814 Switch GRM to not mark GitHub release as a pre-release.
+* 2781 Bump StyleCop to latest version.
+* 2911 C# syntax errors in exceptions causes Specre.CLI internal error.
+* 2861 Fix error output in 1.0 preview.
+* 2853 Custom argument names are not case insensitive in 1.0 preview.
+* 2887 (Frosting) Fix line endings in build.sh within template package.
+* 2734 Can't resolve resource assemblies.
+
+### New in 0.38.5 (Released 2020/09/20)
+
+* 2859 .NET 5 shouldn't be identified as Full Framework or Mono.
+
+### New in 0.38.4 (Released 2020/06/26)
+
+* 2813 Actually ship  0.38.3
+
+### New in 0.38.3 (Released 2020/06/26)
+
+* 2803 ArgumentOutOfRangeException: The DateTimeOffset specified cannot be converted into a Zip file timestamp .
+* 2798 Input string not in correct format starting in v0.38.0.
+* 2799 Bump .NET Core SDK to 3.1.301.
+
+### New in 0.38.2 (Released 2020/06/09)
+
+* 2790 Cake 0.38.1 is failing to write messages to TeamCity
+
+### New in 0.38.1 (Released 2020/05/30)
+
+* 2786 0.38.0 introduces TFBuild obsolete warning for everyone not just users of property
+
+### New in 0.38.0 (Released 2020/05/30)
+
+* 2784 Add NuGet Delete functionality
+* 2749 Add support for ANSI escape codes
+* 2728 Add dotnet NuGet source commands
+* 2718 Add binary logger to dotnet MSBuild settings
+* 2721 NuGet package name/path should be added in quotes
+* 2785 Provide additional logging for tool resolver
+* 2778 Update Roslyn to 3.6.0
+* 2768 Add an option to skip the default warning/error output when running JetBrains command line tools
+* 2764 Additional Jenkins information
+* 2752 MSTestRunner prioritizes VS2017 over VS2019
+* 2745 Extend XmlPeekSettings with FileShare.* option
+* 2733 NuGetSetApiKey with Verbosity set to Quiet causes an exception.
+* 2730 Better handling for GitVersion failure cases
+* 2715 Add missing dotnet NuGet command options
+* 2714 Squash warning when skip package version check
+* 2710 Add GitHub Actions GITHUB_RUN_ID & GITHUB_RUN_NUMBER
+* 2658 Rename TFBuild alias to AzurePipelines
+* 2077 Locating the correct vstest.console.exe (VS2017)
+* 2735 Improve documentation for MSBuild alias to make clear that also MSBuild projects can be passed
+
+### New in 0.37.0 (Released 2020/02/01)
+
+* 2708 Emitting debug information should be done regardless of --debug switch.
+* 2701 Api keys should be secret.
+* 2697 Update to latest release of GitReleaseManager.
+* 2696 Upgrade Cake Alias support for GitReleaseManager.
+* 2691 Missing GitHubActions Alias.
+* 2695 Cake fails to build on travis-ci with latest mono (6.8).
+* 2693 Update .NET Core SDK to 3.1.101.
+
+### New in 0.36.0 (Released 2020/01/11)
+
+* 2677 Add GitHub Actions build provider.
+* 2638 CreateAssemblyInfo alias should allow creation of custom boolean attributes and also empty attributes.
+* 2682 Add .NET Core 3.1 Runtime support.
+* 2679 Add optional GetToolExecutableNames that takes tool settings.
+* 2675 InspectCode: Add support for InspectCode.x86.exe tool.
+* 2673 DotNetCorePublishSettings should support new .NET Core 3 features.
+* 2671 NuGet Install doesn't allow to set NonInteractive to false.
+* 2663 Support Inno Setup 6.
+* 2657 Rename TFBuild.Environment.Repository.Branch to TFBuild.Environment.Repository.BranchName.
+* 2533 Setting SecurityRules with CreateAssemblyInfo.
+* 2532 Publish Cake.Testing.Xunit package.
+* 2328 InspectCode: Add support for new /verbosity argument.
+* 2652 Improve documentation for TFBuildPullRequestInfo.Id and TFBuildPullRequestInfo.Number.
+* 2661 Build not stopped when rethrowing exception in OnError.
+* 2640 Remove unnecessary parameter from AddMetadataAttribute method.
+* 2637 CreateAssemblyInfo alias creates invalid file when using .vb.
+* 2534 Windows 10: System.PlatformNotSupportedException: System.Data.SqlClient is not supported on this platform.
+* 2527 Don't limit the #load to only .cake files.
+* 2498 ParseProject fails on an absolute HintPath.
+* 2275 System.Data.SqlClient in Cake.CoreCLR Assembly Load Error.
+
+### New in 0.35.0 (Released 2019/09/28)
+
+* 2603 Add .NET Core 3 to Cake.Tool update to .NET Core 3 SDK.
+* 2625 Add NuGet Push -SkipDuplicate Flag.
+* 2618 The MSTest tool doesn't pick up the mstest.exe from Visual Studio 2019.
+* 2606 Unable to reference Newtonsoft.Json > 11.0.2.
+* 2601 Update Microsoft.CodeAnalysis.CSharp.Scripting to 3.2.1.
+* 2599 Update to Autofac 4.9.4.
+* 2585 Cake.Tool - How in the world do I run a specific task?.
+* 2590 Update confusing GitVersionVerbosity docs.
+* 2610 Aliases of type 'dynamic' cannot be accessed directly.
+* 2608 TFBuildProvider.IsHostedAgent returns wrong value when running on 2nd build agent.
+
 ### New in 0.34.1 (Released 2019/07/16)
 
 * 2575 v0.34.0 fails on scripts using the dynamic keyword
