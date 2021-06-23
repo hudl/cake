@@ -9,6 +9,9 @@ namespace Cake.Tests.Fakes
     {
         public Script ExecutedScript { get; private set; }
 
+        public bool SupportsCachedExecution { get; }
+        public bool IsCacheValid { get; }
+
         public void AddReference(FilePath path)
         {
         }

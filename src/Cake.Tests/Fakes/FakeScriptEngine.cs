@@ -12,7 +12,7 @@ namespace Cake.Tests.Fakes
             Session = new FakeScriptSession();
         }
 
-        public IScriptSession CreateSession(IScriptHost host)
+        public IScriptSession CreateSession(IScriptHost host, string sessionCacheToken)
         {
             ScriptHost = host;
             return Session;

@@ -36,7 +36,6 @@ namespace Cake.Infrastructure.Scripting
 
         public HashSet<string> Namespaces { get; }
 
-
         public bool SupportsCachedExecution => true;
 
         public bool IsCacheValid => System.IO.File.Exists(GetCachedAssemblyPath()) && _cacheEnabled && !_forceRecompile;
@@ -59,8 +58,6 @@ namespace Cake.Infrastructure.Scripting
             ReferencePaths = new HashSet<FilePath>(PathComparer.Default);
             References = new HashSet<Assembly>();
             Namespaces = new HashSet<string>(StringComparer.Ordinal);
-
-            var configuration = new CakeConfiguration(options?.Arguments ?? new Dictionary<string, string>());
 
             var cacheEnabled = configuration.GetValue(Constants.Cache.Enabled) ?? "false";
             _cacheEnabled = cacheEnabled.Equals("true", StringComparison.OrdinalIgnoreCase);
@@ -212,7 +209,7 @@ namespace Cake.Infrastructure.Scripting
         {
             _log.Verbose("Running cached assembly from " + assemblyPath);
             var directory = System.IO.Path.GetDirectoryName(assemblyPath);
-        
+
             foreach (var asm in System.IO.Directory.GetFiles(directory))
             {
                 if (asm.EndsWith(".dll"))
